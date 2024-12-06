@@ -218,5 +218,5 @@ def delendos(user:str,region:str) -> tuple[list[str],str]:
      
     
 if __name__ == "__main__":
-    print(delendos("DragoE","empires_forever_united"))
+    print("e")
     
