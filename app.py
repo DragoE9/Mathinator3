@@ -29,6 +29,7 @@ class Mathinator:
         self.is_running = False
         self.banlist_mode = tk.StringVar()
         self.clear_mode = tk.StringVar()
+        self.kill_everyone = tk.BooleanVar()
         
         #Widget Building Here
         self.window = p_window
@@ -46,6 +47,7 @@ class Mathinator:
         banmode2 = tk.Radiobutton(self.window,text="WA Focus",value="wa",variable=self.banlist_mode)
         banmode3 = tk.Radiobutton(self.window,text="Efficiency Weighted",value="ef",variable=self.banlist_mode)
         banlist_button = tk.Button(self.window,text="Make Banlist",command=self.banlistinator)
+        override_check = tk.Checkbutton(self.window,text="Kill Everyone Override",variable=self.kill_everyone,onvalue=True,offvalue=False)
         label4 = tk.Label(self.window,text="----  Region Clearing: ----")
         clearmode1 = tk.Radiobutton(self.window,text="Dirty",value="dirty",variable=self.clear_mode)
         clearmode2 = tk.Radiobutton(self.window,text="With Password",value="pass",variable=self.clear_mode)
@@ -66,12 +68,13 @@ class Mathinator:
         banmode2.grid(row=4,column=1,padx=(10,10),pady=(10,10))
         banmode3.grid(row=4,column=2,padx=(10,100),pady=(10,10))
         banlist_button.grid(row=5,column=1,padx=(10,10),pady=(10,10))
-        label4.grid(row=6,column=0,columnspan=3,padx=(100,100),pady=(10,10))
-        clearmode1.grid(row=7,column=0,padx=(100,10),pady=(10,10))
-        clearmode2.grid(row=7,column=1,padx=(10,10),pady=(10,10))
-        clearmode3.grid(row=7,column=2,padx=(10,100),pady=(10,10))
-        clear_button.grid(row=8,column=1,padx=(10,10),pady=(10,10))
-        self.log.grid(row=9,column=0,columnspan=3,padx=(100,100),pady=(10,10))
+        override_check.grid(row=6,column=1,padx=(10,10),pady=(10,10))
+        label4.grid(row=7,column=0,columnspan=3,padx=(100,100),pady=(10,10))
+        clearmode1.grid(row=8,column=0,padx=(100,10),pady=(10,10))
+        clearmode2.grid(row=8,column=1,padx=(10,10),pady=(10,10))
+        clearmode3.grid(row=8,column=2,padx=(10,100),pady=(10,10))
+        clear_button.grid(row=9,column=1,padx=(10,10),pady=(10,10))
+        self.log.grid(row=10,column=0,columnspan=3,padx=(100,100),pady=(10,10))
         
         #Redirect the Console Logs to the window
         console = Logger(self.log)
@@ -150,12 +153,13 @@ class Mathinator:
         self.is_running == True
             
         #Remove any WAs endorsing the delegate from the table
-        goodnations = ut.delendos(self.user.get(),self.target.get().lower().replace(" ","_"))
-        try:
-            nations = nations[(~nations["NAME"].isin(goodnations))]
-        except:
-            self.is_running == False
-            return None
+        if self.kill_everyone == False:
+            goodnations = ut.delendos(self.user.get(),self.target.get().lower().replace(" ","_"))
+            try:
+                nations = nations[(~nations["NAME"].isin(goodnations))]
+            except:
+                self.is_running == False
+                return None
         
         if self.banlist_mode.get() == "inf":
             nations = nations.sort_values(by=["INFLUENCENUM"], ascending=True)

@@ -18,7 +18,7 @@ def last_activity(lastlogin:int,lastmajor:datetime.datetime) -> float:
 
 def endocounter(endos) -> int:
     """count the number of endos a nation has"""
-    if isinstance(endos, float):
+    if isinstance(endos, float) or endos is None:
         #Only the NaNs should come up as floats when checked
         return 0
     else:
@@ -143,7 +143,7 @@ def make_regiontable(nations:pandas.DataFrame, region:str, user:str):
                 response = requests.get("https://www.nationstates.net/cgi-bin/api.cgi?nation={}&q=lastlogin".format(nation), headers=headers)
                 response.raise_for_status()
                 tree = ET.fromstring(response.text)
-                nationdata.replace(nationdata.iloc[0]["LASTLOGIN"], tree.find("LASTLOGIN").text, inplace=True)
+                nationdata.replace(nationdata.iloc[0]["LASTLOGIN"], int(tree.find("LASTLOGIN").text), inplace=True)
             except Exception as e:
                 print(e)
             sleep(0.7)
@@ -154,6 +154,7 @@ def make_regiontable(nations:pandas.DataFrame, region:str, user:str):
                 nationdata.replace(nationdata.iloc[0]["INFLUENCENUM"], tree.find("INFLUENCENUM").text, inplace=True)
             except Exception as e:
                 print(e)
+            regiontable = pandas.concat([regiontable,nationdata],ignore_index=True)
             sleep(0.7)
     
     regiontable["ENDORSEMENTS"] = regiontable["ENDORSEMENTS"].apply(lambda x: endocounter(x))
